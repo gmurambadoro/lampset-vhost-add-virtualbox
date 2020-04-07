@@ -32,4 +32,15 @@ if dir_name is None:
     dir_name = domain
 
 # check if dir_name exists
+if not path.exists(dir_name):
+    dir_name = path.join(WEB_ROOT, dir_name)
+
+if not path.exists(dir_name):
+    raise FileNotFoundError('The path does not exist: %s' % dir_name)
+
+# create the actual domain name
+if not int(no_localhost or '0'):
+    domain = domain + '.localhost'
+
+print(domain, no_localhost)
 
