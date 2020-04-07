@@ -7,8 +7,9 @@ import shutil
 
 """
 This script is used to create and activate an apache2 vhost file.
+This file needs to run with privileges because it makes changes apache2 system folders
 Usage:
-    vhost-activate --domain test --dir test --localhost
+    vhost-activate.py -h
 """
 
 WEB_ROOT = '/var/www/'
