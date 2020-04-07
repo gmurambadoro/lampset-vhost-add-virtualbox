@@ -72,8 +72,6 @@ vhost_str = """
 </VirtualHost>
 """.strip().replace('{DOMAIN}', domain).replace('{DIR}', dir_name)
 
-print(vhost_str)
-
 vhost_conf_src = path.join(WORK_FOLDER, domain + ".conf")
 
 with open(vhost_conf_src, 'w') as file:
