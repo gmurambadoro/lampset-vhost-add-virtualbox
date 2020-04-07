@@ -3,6 +3,7 @@
 import argparse
 import os.path as path
 import os
+import shutil
 
 """
 This script is used to create and activate an apache2 vhost file.
@@ -11,8 +12,11 @@ Usage:
 """
 
 WEB_ROOT = '/var/www/'
+WORK_FOLDER = '/home/gavin/.vhost/'
+APACHE_SITES_FOLDER = '/etc/apache2/sites-available/'
 
 parser = argparse.ArgumentParser()
+
 parser.add_argument('domain', help="The name of the domain e.g. test.com. The suffix *.localhost will be appended "
                                    "automatically")
 parser.add_argument('--dir', required=False, help="The path to the document_root. "
@@ -20,7 +24,7 @@ parser.add_argument('--dir', required=False, help="The path to the document_root
                     "relative to the Apache web_root folder {WEB_ROOT}".replace('{WEB_ROOT}', WEB_ROOT))
 parser.add_argument('--no-localhost', required=False, help="Specify this flag if you do not want *.localhost to "
                     "be appended automatically to the domain. However, you will need to add this domain to "
-                    "/etc/hosts file yourself")
+                    "/etc/hosts file yourself", action="store_true")
 
 args = parser.parse_args()
 
@@ -39,8 +43,46 @@ if not path.exists(dir_name):
     raise FileNotFoundError('The path does not exist: %s' % dir_name)
 
 # create the actual domain name
-if not int(no_localhost or '0'):
+if not no_localhost:
     domain = domain + '.localhost'
 
-print(domain, no_localhost)
+# create the working folder
+if not path.exists(WORK_FOLDER):
+    os.mkdir(WORK_FOLDER)
 
+vhost_str = """
+<VirtualHost *:80>
+    ServerName {DOMAIN}
+
+    DocumentRoot {DIR}
+    <Directory {DIR}>
+        AllowOverride All
+        Order Allow,Deny
+        Allow from All
+    </Directory>
+
+    ErrorLog /var/log/apache2/{DOMAIN}_error.log
+    CustomLog /var/log/apache2/{DOMAIN}_access.log combined
+</VirtualHost>
+""".strip().replace('{DOMAIN}', domain).replace('{DIR}', dir_name)
+
+print(vhost_str)
+
+vhost_conf_src = path.join(WORK_FOLDER, domain + ".conf")
+
+with open(vhost_conf_src, 'w') as file:
+    file.write(vhost_str)
+
+# create the destination path to store the config
+vhost_conf_dest = path.join(APACHE_SITES_FOLDER, vhost_conf_src)
+
+if path.exists(vhost_conf_dest):
+    raise FileExistsError('The file `%s` already exists.' % vhost_conf_dest)
+
+shutil.copy(vhost_conf_src, vhost_conf_dest)
+
+# activate the site
+os.system('sudo systemctl a2ensite %s' % path.basename(vhost_conf_dest))
+
+# restart apache 2
+os.system('sudo systemctl reload apache2')
