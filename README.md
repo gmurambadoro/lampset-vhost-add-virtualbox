@@ -1,4 +1,4 @@
-# Apache2 vhost Maker
+# Apache2 VHost Maker
 
 This is a little Python utility script to generate (and activate) a vhost for a development site on localhost
 
@@ -9,3 +9,18 @@ I used to use the Wamp *add_vhost.php* file on Windows, but since I dumped Windo
 Only recently I learnt a bit of Bash scripting and [Python](https://python.org) and I would wondered if it would be a cool idea to write a simple automation script for provisioning a vhost on an Ubuntu-based apache2 development server.
 
 This is for the fun of it and let's see how it all goes.
+
+## Installation
+
+```
+$ cd ~/Downloads
+$ git clone https://github.com/gmurambadoro/apache2-vhost-maker.git
+$ cd apache2-vhost-maker
+$ chmod +x vhost-activate.py
+```
+
+## Usage
+
+```
+
+```
