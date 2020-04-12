@@ -22,5 +22,5 @@ $ chmod +x vhost-activate.py
 ## Usage
 
 ```
-
+$ ./vhost-activate.py domain --dir=/path/to/dir [--no-localhost] [--override]
 ```
