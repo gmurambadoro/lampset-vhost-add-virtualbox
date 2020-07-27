@@ -16,15 +16,21 @@ WEB_ROOT = '/var/www/'
 WORK_FOLDER = '/tmp/'
 APACHE_SITES_FOLDER = '/etc/apache2/sites-available/'
 
+
 # todo: use php fpm
 
+def is_granted(msg_prompt: str) -> bool:
+    resp = prompt(msg_prompt=msg_prompt, accept_empty=False, max_retries=3)
 
-def get_keyboard_input(prompt: str, accept_empty: bool, retries: int = None) -> str:
-    if not retries:
-        retries = 3
+    return resp.strip().lower() in ['y']
 
-    for _ in range(0, retries):
-        resp = input(prompt).strip()
+
+def prompt(msg_prompt: str, accept_empty: bool, max_retries: int = None) -> str:
+    if not max_retries:
+        max_retries = 3
+
+    for _ in range(0, max_retries):
+        resp = input(msg_prompt).strip()
 
         if resp:
             return resp
@@ -64,21 +70,30 @@ parser.add_argument('--override', required=False, action='store_true',
 
 args = parser.parse_args()
 
+php_versions = ['5.6', '7.1', '7.2', '7.3', '7.4']
+php_version = None
+
 if args.interactive:
     print("""
 Welcome to Apache2 VHost File Generation Tool.
 Version: 1.0.0    
 Notes: This tool allows you to create and activate an Apache2 vhost file for a development or testing domain.
     """)
-    domain = get_keyboard_input('Domain name - e.g. example.com: ', False)
-    dir_name = get_keyboard_input(f'Web Directory [{WEB_ROOT}{domain}]: ', True) or domain
-    no_localhost = not (get_keyboard_input(
-        prompt=f'Do you want to append .localhost to the domain [{domain}.localhost] (y|N):',
+    domain = prompt('Domain name - e.g. example.com: ', False)
+    dir_name = prompt(f'Web Directory [{WEB_ROOT}{domain}]: ', True) or domain
+    no_localhost = not (prompt(
+        msg_prompt=f'Do you want to append .localhost to the domain [{domain}.localhost] (y|N): ',
         accept_empty=False).strip().lower() == 'y')
 
-    override = get_keyboard_input(
-        prompt='Do yo want to overwrite existing configuration if it exists? (y|N): ',
+    override = prompt(
+        msg_prompt='Do yo want to overwrite existing configuration if it exists? (y|N): ',
         accept_empty=False).lower() == 'y'
+
+    if is_granted('Do you have PHP-FPM enabled?'):
+        php_version = prompt('Enter your PHP Version e.g. 7.2, 7.4 [7.4]: ', accept_empty=False, max_retries=3) or '7.4'
+
+        if not php_version:
+            raise RuntimeError('Please select a valid PHP version: ' + str(php_versions))
 else:
     domain = args.domain
     dir_name = args.dir
@@ -116,11 +131,22 @@ vhost_str = """
         Order Allow,Deny
         Allow from All
     </Directory>
+    
+    {PHP_FPM}
 
     ErrorLog /var/log/apache2/{DOMAIN}_error.log
     CustomLog /var/log/apache2/{DOMAIN}_access.log combined
 </VirtualHost>
 """.strip().replace('{DOMAIN}', domain).replace('{DIR}', dir_name)
+
+php_fpm = """
+    <FilesMatch \.php$>
+        # For Apache version 2.4.10 and above, use SetHandler to run PHP as a fastCGI process server
+        SetHandler "proxy:unix:/run/php/php{PHP_VER}-fpm.sock|fcgi://localhost"
+    </FilesMatch>
+""".replace('{PHP_VER}', php_version or 'PHP_VERSION_NOT_SET')
+
+vhost_str = vhost_str.replace('{PHP_FPM}', php_fpm if php_version else '')
 
 vhost_conf_src = path.join(WORK_FOLDER, domain + ".conf")
 
@@ -143,3 +169,8 @@ os.system('sudo a2ensite %s' % path.basename(vhost_conf_dest))
 
 # restart apache 2
 os.system('sudo systemctl reload apache2')
+
+os.system('cat ' + vhost_conf_dest)
+
+print()
+
