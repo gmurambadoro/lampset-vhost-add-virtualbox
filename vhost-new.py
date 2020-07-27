@@ -6,7 +6,7 @@ import os
 import shutil
 
 """
-This script is used to create and activate an apache2 vhost file.
+This script is used to create and activate an Apache2 vhost file.
 This file needs to run with privileges because it makes changes apache2 system folders
 Usage:
     vhost-new.py -h
@@ -65,11 +65,16 @@ parser.add_argument('--override', required=False, action='store_true',
 args = parser.parse_args()
 
 if args.interactive:
-    domain = get_keyboard_input('Domain e.g. example.com: ', False)
+    print("""
+Welcome to Apache2 VHost File Generation Tool.
+Version: 1.0.0    
+Notes: This tool allows you to create and activate an Apache2 vhost file for a development or testing domain.
+    """)
+    domain = get_keyboard_input('Domain name - e.g. example.com: ', False)
     dir_name = get_keyboard_input(f'Web Directory [{WEB_ROOT}{domain}]: ', True) or domain
-    no_localhost = get_keyboard_input(
+    no_localhost = not (get_keyboard_input(
         prompt=f'Do you want to append .localhost to the domain [{domain}.localhost] (y|N):',
-        accept_empty=False).lower() == 'y'
+        accept_empty=False).strip().lower() == 'y')
 
     override = get_keyboard_input(
         prompt='Do yo want to overwrite existing configuration if it exists? (y|N): ',
@@ -95,7 +100,7 @@ if not path.exists(dir_name):
 
 # create the actual domain name
 if not no_localhost:
-    domain = domain + '.localhost'
+    domain += '.localhost'
 
 # create the working folder
 if not path.exists(WORK_FOLDER):
