@@ -79,8 +79,11 @@ Welcome to Apache2 VHost File Generation Tool.
 Version: 1.0.0    
 Notes: This tool allows you to create and activate an Apache2 vhost file for a development or testing domain.
     """)
+
     domain = prompt('Domain name - e.g. example.com: ', False)
+
     dir_name = prompt(f'Web Directory [{WEB_ROOT}{domain}]: ', True) or domain
+
     no_localhost = not (prompt(
         msg_prompt=f'Do you want to append .localhost to the domain [{domain}.localhost] (y|N): ',
         accept_empty=False).strip().lower() == 'y')
