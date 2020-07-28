@@ -92,7 +92,7 @@ Notes: This tool allows you to create and activate an Apache2 vhost file for a d
         msg_prompt='Do yo want to overwrite existing configuration if it exists? (y|N): ',
         accept_empty=False).lower() == 'y'
 
-    if is_granted('Do you have PHP-FPM enabled?'):
+    if is_granted('Do you have PHP-FPM enabled? (y|N): '):
         php_version = prompt('Enter your PHP Version e.g. 7.2, 7.4 [7.4]: ', accept_empty=False, max_retries=3) or '7.4'
 
         if not php_version:
