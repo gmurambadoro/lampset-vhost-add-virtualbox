@@ -1,9 +1,8 @@
 #!/usr/bin/python3
 
 import argparse
-import os.path as path
 import os
-import shutil
+import os.path as path
 
 """
 This script is used to create and activate an Apache2 vhost file.
@@ -16,8 +15,6 @@ WEB_ROOT = '/var/www/'
 WORK_FOLDER = '/tmp/'
 APACHE_SITES_FOLDER = '/etc/apache2/sites-available/'
 
-
-# todo: use php fpm
 
 def is_granted(msg_prompt: str) -> bool:
     resp = prompt(msg_prompt=msg_prompt, accept_empty=False, max_retries=3)
@@ -68,6 +65,10 @@ parser.add_argument('--no-localhost',
 parser.add_argument('--override', required=False, action='store_true',
                     help='Override a vhost if the configuration file already exists.')
 
+parser.add_argument('--php-version',
+                    required=False,
+                    help='If using PHP-FPM then specify the version of PHP that the site runs under.')
+
 args = parser.parse_args()
 
 php_versions = ['5.6', '7.1', '7.2', '7.3', '7.4']
@@ -82,18 +83,17 @@ Notes: This tool allows you to create and activate an Apache2 vhost file for a d
 
     domain = prompt('Domain name - e.g. example.com: ', False)
 
-    dir_name = prompt(f'Web Directory [{WEB_ROOT}{domain}]: ', True) or domain
+    dir_name = os.path.join(WEB_ROOT, prompt(f'Web Directory [{WEB_ROOT}{domain}]: ', True) or domain)
 
-    no_localhost = not (prompt(
-        msg_prompt=f'Do you want to append .localhost to the domain [{domain}.localhost] (y|N): ',
-        accept_empty=False).strip().lower() == 'y')
+    no_localhost = not (is_granted(
+        msg_prompt=f'Do you want to append .localhost to the domain [{domain}.localhost] (y|N): ')
+    )
 
-    override = prompt(
-        msg_prompt='Do yo want to overwrite existing configuration if it exists? (y|N): ',
-        accept_empty=False).lower() == 'y'
+    override = is_granted(msg_prompt='Do yo want to overwrite existing configuration if it exists? (y|N): ')
 
     if is_granted('Do you have PHP-FPM enabled? (y|N): '):
-        php_version = prompt('Enter your PHP Version e.g. 7.2, 7.4 [7.4]: ', accept_empty=False, max_retries=3) or '7.4'
+        php_version = prompt('Enter your PHP Version e.g. %s [7.4]: ' % str(php_versions),
+                             accept_empty=False, max_retries=3) or '7.4'
 
         if not php_version:
             raise RuntimeError('Please select a valid PHP version: ' + str(php_versions))
@@ -106,11 +106,10 @@ else:
     if dir_name is None:
         dir_name = domain
 
-if not dir_name:
-    raise RuntimeError(f'Empty document directory!!!')
+    php_version = args.php_version or '7.4'
 
 # check if dir_name exists
-if not path.exists(dir_name):
+if dir_name and (not path.exists(dir_name)) and (not dir_name.startswith(WEB_ROOT)):
     dir_name = path.join(WEB_ROOT, dir_name)
 
 if not path.exists(dir_name):
@@ -172,6 +171,10 @@ os.system('sudo a2ensite %s' % path.basename(vhost_conf_dest))
 
 # restart apache 2
 os.system('sudo systemctl reload apache2')
+
+print()
+
+print("==".center(50, '='))
 
 os.system('cat ' + vhost_conf_dest)
 
