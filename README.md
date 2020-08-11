@@ -17,6 +17,7 @@ $ cd ~/Downloads
 $ git clone https://github.com/gmurambadoro/apache2-vhost-maker.git
 $ cd apache2-vhost-maker
 $ chmod +x vhost-new.py
+$ ln -s vhost-new ~/.local/bin/vhost-new
 ```
 
 ## Usage
