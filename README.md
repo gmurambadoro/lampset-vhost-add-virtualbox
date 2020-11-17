@@ -1,4 +1,4 @@
-# Lapset VHost Manager
+# Lapset Virtual Host Manager
 
 **lapset-vhost-add** is little Python utility script to generate (and activate) a vhost for a development site on localhost
 
