@@ -2,7 +2,7 @@
 
 **lampset-vhost-add** is little Python utility script to generate (and activate) a vhost for a development site on localhost
 
-As a full-time web developer I find myself needing to start up a web application on my development machine (*localhost*). I have *apache2* and the latest *php* installed on it and many a time I need to create a *vhost* for the application I will be working with.
+As a full-time web developer I find myself needing to start up a web application on my development machine (*localhost*). I have *Apache2* and the latest *PHP* installed on it and many a time I need to create a *vhost* for the application I will be working with.
 
 I used to use the Wamp *add_vhost.php* file on Windows, but since I dumped Windows more than 12 months ago, I have been doing this via the command line on my [Linux Mint](https://www.linuxmint.com).
 
@@ -18,31 +18,31 @@ $ git clone https://github.com/gmurambadoro/lampset-vhost-add.git
 $ cd lampset-vhost-add
 $ chmod +x lampset-vhost-add.py
 $ sudo mv lampset.py /usr/local/bin/vhost-add
-$ vhost-add --help
+$ lampset-vhost-add --help
 ```
 
 ## Usage
 
-You can run this *lapset-vhost-add* script in one of two modes, namely:
+You can run *lampset-vhost-add* script in one of two modes, namely:
 
 * Interactive mode
 * Command-line mode
 
-### Interactive Mode
+#### 1. Interactive Mode
 
 ```
-$ vhost-add --interactive
+$ lampset-vhost-add --interactive
 ```
 
 In this mode, you will be asked a series of questions about the vhost to be created.
 
-### Command-Line Usage
+#### 2. Command-Line Usage
 
 In this mode you specify all the required parameters needed to create a vhost.
 
 ```
-$ vhost-add domain --dir=/path/to/dir [--no-localhost] [--override] [--php-version=7.4]
+$ lampset-vhost-add domain --dir=/path/to/dir [--no-localhost] [--override] [--php-version=7.4]
 ```
 
-Type in `$ vhost-add --help` for more usage documentation.
+Type in `$ lampset-vhost-add --help` for more usage documentation.
 
