@@ -1,6 +1,6 @@
-# Lapset Virtual Host Manager
+# LAMPSET Virtual Host Manager
 
-**lapset-vhost-add** is little Python utility script to generate (and activate) a vhost for a development site on localhost
+**lampset-vhost-add** is little Python utility script to generate (and activate) a vhost for a development site on localhost
 
 As a full-time web developer I find myself needing to start up a web application on my development machine (*localhost*). I have *apache2* and the latest *php* installed on it and many a time I need to create a *vhost* for the application I will be working with.
 
@@ -14,10 +14,11 @@ This is for the fun of it and let's see how it all goes.
 
 ```
 $ cd ~/Downloads
-$ git clone https://github.com/gmurambadoro/lapset-vhost-add.git
-$ cd lapset-vhost-add
-$ chmod +x main.py
-$ ln -s main ~/.local/bin/lapset-vhost-add
+$ git clone https://github.com/gmurambadoro/lampset-vhost-add.git
+$ cd lampset-vhost-add
+$ chmod +x lampset-vhost-add.py
+$ sudo mv lampset.py /usr/local/bin/vhost-add
+$ vhost-add --help
 ```
 
 ## Usage
@@ -30,7 +31,7 @@ You can run this *lapset-vhost-add* script in one of two modes, namely:
 ### Interactive Mode
 
 ```
-$ lapset-vhost-add --interactive
+$ vhost-add --interactive
 ```
 
 In this mode, you will be asked a series of questions about the vhost to be created.
@@ -40,7 +41,8 @@ In this mode, you will be asked a series of questions about the vhost to be crea
 In this mode you specify all the required parameters needed to create a vhost.
 
 ```
-$ lapset-vhost-add domain --dir=/path/to/dir [--no-localhost] [--override] [--php-version=7.4]
+$ vhost-add domain --dir=/path/to/dir [--no-localhost] [--override] [--php-version=7.4]
 ```
 
-Type in `$ lapset-vhost-add --help` for more usage documentation.
+Type in `$ vhost-add --help` for more usage documentation.
+
