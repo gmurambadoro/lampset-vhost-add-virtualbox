@@ -71,7 +71,7 @@ parser.add_argument('--php-version',
 
 args = parser.parse_args()
 
-php_versions = ['5.6', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1']
+php_versions = ['8.1', '8.2']
 php_version = None
 
 if args.interactive:
